@@ -123,7 +123,11 @@ type
 
     PyLibrary: string;
     PyChangeSlow: integer;
-    PyInitLog: boolean;
+
+    LogPluginIniting: boolean;
+    LogSessions: boolean;
+    LogDebug: boolean;
+    LogConsole: boolean;
 
     LexerThemes: boolean;
     LexerMenuGrouped: boolean;
@@ -279,8 +283,6 @@ type
     ReloadFollowTail: boolean;
     FullScreen: string;
     MouseGotoDefinition: string;
-    LogDebug: boolean;
-    LogConsole: boolean;
 
     Emmet_AddSlashToEmptyTags: boolean;
     Emmet_CommentTags: boolean;
@@ -1315,7 +1317,11 @@ begin
     TreeSublexers:= false;
 
     PyChangeSlow:= 2000;
-    PyInitLog:= true;
+
+    LogPluginIniting:= true;
+    LogSessions:= true;
+    LogDebug:= false;
+    LogConsole:= false;
 
     NewdocLexer:= '';
     NewdocEnc:= 'utf8';
@@ -1367,8 +1373,6 @@ begin
     ReloadUnsavedConfirm:= true;
     FullScreen:= 'tp';
     MouseGotoDefinition:= 'a';
-    LogDebug:= false;
-    LogConsole:= false;
 
     Emmet_AddSlashToEmptyTags:= true;
     Emmet_CommentTags:= false;

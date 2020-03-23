@@ -258,8 +258,11 @@ begin
     end;
   end;
 
-  value:= 'Saved session: "'+ExtractFileName(AFileName)+'", '+IntToStr(nCountFiles)+' file(s)';
-  MsgLogConsole(value);
+  if UiOps.LogSessions then
+  begin
+    value:= 'Saved session: "'+ExtractFileName(AFileName)+'", '+IntToStr(nCountFiles)+' file(s)';
+    MsgLogConsole(value);
+  end;
 end;
 
 function IsHistorySectionForFilename(const s: string): boolean;
@@ -283,6 +286,7 @@ var
   nTick: QWord;
 const
   SOptionPassive = '/passive /nonear';
+  SOptionNoHistory = '/nohistory'; //on loading session, we disable loading of main app history
 begin
   Result:= false;
   if AFileName='' then exit;
@@ -362,7 +366,7 @@ begin
         if (FrameCount>0) and Frames[0].IsEmpty then
           Frame:= Frames[0]
         else
-          Frame:= DoFileOpen('', '', Pages, SOptionPassive);
+          Frame:= DoFileOpen('', '', Pages, SOptionPassive+SOptionNoHistory);
         if sFilename<>'' then
         begin
           Frame.FileName:= sFilename;
@@ -380,7 +384,7 @@ begin
       if FileExistsUTF8(sFilename) then
       begin
         Inc(nCountFiles);
-        Frame:= DoFileOpen(sFilename, '', Pages, sOpenOptions+SOptionPassive);
+        Frame:= DoFileOpen(sFilename, '', Pages, sOpenOptions+SOptionPassive+SOptionNoHistory);
       end;
 
       if Assigned(Frame) then
@@ -448,10 +452,13 @@ begin
 
   nTick:= (GetTickCount64-nTick) div 10 * 10;
 
-  sText:= 'Loaded session: "'+ExtractFileName(AFileName)+'", '+IntToStr(nTick)+'ms, '+IntToStr(nCountFiles)+' file(s)';
-  if nCountFilesModified>0 then
-    sText+= ' + '+IntToStr(nCountFilesModified)+' modified';
-  MsgLogConsole(sText);
+  if UiOps.LogSessions then
+  begin
+    sText:= 'Loaded session: "'+ExtractFileName(AFileName)+'", '+IntToStr(nTick)+'ms, '+IntToStr(nCountFiles)+' file(s)';
+    if nCountFilesModified>0 then
+      sText+= ' + '+IntToStr(nCountFilesModified)+' modified';
+    MsgLogConsole(sText);
+  end;
 
   SetLength(Params, 1);
   Params[0]:= AppVariant(APPSTATE_SESSION_LOAD);
@@ -1008,8 +1015,6 @@ begin
   UiOps.FullScreen:= cfg.GetValue('ui_fullscreen', UiOps.FullScreen);
 
   UiOps.MouseGotoDefinition:= cfg.GetValue('mouse_goto_definition', UiOps.MouseGotoDefinition);
-  //UiOps.LogDebug:= cfg.GetValue('log_debug', UiOps.LogDebug);
-  UiOps.LogConsole:= cfg.GetValue('log_console', UiOps.LogConsole);
 
   UiOps.Emmet_AddSlashToEmptyTags:= cfg.GetValue('emmet_add_slash_to_empty_tags', UiOps.Emmet_AddSlashToEmptyTags);
   UiOps.Emmet_CommentTags:= cfg.GetValue('emmet_comment_tags', UiOps.Emmet_CommentTags);
@@ -1144,7 +1149,11 @@ begin
   UiOps.TreeSublexers:= cfg.GetValue('ui_tree_sublexers', UiOps.TreeSublexers);
 
   UiOps.PyChangeSlow:= cfg.GetValue('py_change_slow', UiOps.PyChangeSlow);
-  UiOps.PyInitLog:= cfg.GetValue('py_init_log', UiOps.PyInitLog);
+
+  UiOps.LogPluginIniting:= cfg.GetValue('py_init_log', UiOps.LogPluginIniting);
+  UiOps.LogSessions:= cfg.GetValue('log_sessions', UiOps.LogSessions);
+  //UiOps.LogDebug:= cfg.GetValue('log_debug', UiOps.LogDebug);
+  UiOps.LogConsole:= cfg.GetValue('log_console', UiOps.LogConsole);
 
   UiOps.NewdocLexer:= cfg.GetValue('newdoc_lexer', UiOps.NewdocLexer);
   UiOps.NewdocEnc:= cfg.GetValue('newdoc_encoding', UiOps.NewdocEnc);

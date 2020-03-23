@@ -476,6 +476,16 @@ function TAppPython.ImportModuleCached(const AModule: string): PPyObject;
 var
   N: integer;
 begin
+  N:= LoadedModules.IndexOf(AModule);
+  if N>=0 then
+    Result:= PPyObject(LoadedModules.Objects[N])
+  else
+  begin
+    if UiOps.LogPluginIniting then
+      MsgLogConsole('Init: '+AModule);
+    Result:= FEngine.PyImport_ImportModule(PChar(AModule));
+    LoadedModules.AddObject(AModule, TObject(Result))
+  end;
 end;
 
 function TAppPython.RunModuleFunction(const AModule,AFunc:string;
